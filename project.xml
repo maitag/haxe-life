@@ -9,7 +9,7 @@
 	<source path="Source" />
 	
 	<haxelib name="lime" />
-	<haxedef name="dom" /><!-- canvas or dom -->
+	<!-- <haxedef name="dom" /> --> <!-- canvas or dom to AVOID webGl -->
 	
 	<assets path="Assets" rename="assets" exclude="*.svg" />
 	<icon path="Assets/lime.svg" />

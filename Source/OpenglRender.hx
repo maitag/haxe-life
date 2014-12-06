@@ -15,10 +15,6 @@ import lime.utils.GLUtils;
 class OpenglRender
 {
 
-	public function new() {
-		trace('static class for Lime OpenGL Rendering');
-	}
-
 	private static var buffer:GLBuffer;
 	private static var matrixUniform:GLUniformLocation;
 	private static var program:GLProgram;
@@ -30,6 +26,10 @@ class OpenglRender
 	private static var g:Float;
 	private static var b:Float;
 	private static var a:Float;
+
+	public function new() {
+		trace('static class for Lime OpenGL Rendering');
+	}
 
 	public static function init(gl:Dynamic, background:Int, image:Image, scale:Float):Void {
 
