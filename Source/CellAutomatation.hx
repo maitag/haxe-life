@@ -21,27 +21,27 @@ class CellAutomatation
 	
 	// some Rules	
 	public static var cellRules = [
-		'0/2',			// Live Free or Die
-		'23/3',			// Conway's Game of Life
+		'0/2',	// Live Free or Die
+		'23/3',	// Conway's Game of Life
 		'5/345',
-		'23/36',		// HighLife
+		'23/36',	// HighLife
 		'34/34',
 		'023/3',
 		'245/368',
 		'245/368',
 		'238/357',
-		'1245/3',		// mazetric
-		'12345/3',		// maze
+		'1245/3',	// Mazetric
+		'12345/3',	// Maze
 		'1234/3',
 		'1345/3',
 		'1345/32',
-		'45678/3',		// Coral
-		'1358/357',		// Amoeba
+		'45678/3',	// Coral
+		'1358/357',	// Amoeba
 		'4567/345',
 		'1357/1357',	// Replicator
 		'2345/45678',
 		'35678/4678',
-		'34678/3678',	// Daynifght
+		'34678/3678',	// DayNight
 		'02468/1357',
 		'235678/378',
 		'235678/3678'
