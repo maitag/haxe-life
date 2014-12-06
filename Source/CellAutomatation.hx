@@ -4,7 +4,7 @@ import lime.graphics.Image;
 
 
 // coded by Sylvio Sell, 2014 rostock germany
-// regards to all haxe, openfl, lime humans
+// regards to all haxe, openfl lime humans
 // (motivation from openfl-chat to try it in haxe ;)
 // look here: http://www.conwaylife.com/wiki/Cellular_automaton 
 // to be is where to go ;)=
