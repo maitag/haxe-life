@@ -1,7 +1,10 @@
 package;
 
 import lime.app.Application;
-import lime.graphics.RenderContext;
+import lime.graphics.Renderer;
+import lime.math.Rectangle;
+import lime.math.Vector2;
+import lime.ui.Window;
 import lime.graphics.Image;
 import lime.graphics.utils.ImageCanvasUtil;
 import lime.Assets;
@@ -10,47 +13,48 @@ import haxe.Timer;
 
 class Main extends Application {
 	
-	private var lastTime:Float;
-	private var time:Float = 0.05;
-	private var swap:Bool = false;
-	private var spawnCells:Bool = false;
+	var lastTime:Float;
+	var time:Float = 0.05;
+	var swap:Bool = false;
+	var spawnCells:Bool = false;
 	
-	private var rule:String = '23/3'; // Conway's
+	var rule:String = '23/3'; // Conway's
 	
 	#if flash
-	private var src_bitmap:flash.display.Bitmap;
-	private var dest_bitmap:flash.display.Bitmap;
+	var src_bitmap:flash.display.Bitmap;
+	var dest_bitmap:flash.display.Bitmap;
 	#end
 	
-	private var src_image:Image;
-	private var dest_image:Image;
+	var src_image:Image;
+	var dest_image:Image;
 	
-	private var scale:Float = 4.0;
+	var scale:Float = 4.0;
+	
+	var bgColor:Int = 0x000000ff;
+	var fgColor:Int = 0x70f409ff;
+	
+	var w:Int = 300;
+	var h:Int = 200;
 	
 	public function new () {
 		super ();
 	}
 	
-	
-	public override function init (context:RenderContext):Void {
+	public override function onWindowCreate (window:Window):Void {
 		
 		//src_image = Assets.getImage ("assets/start.png");
-		src_image  = new Image(null, 0, 0, 300, 200, CellAutomatation.BG_COLOR);
-		dest_image = new Image(null, 0, 0, 300, 200, CellAutomatation.BG_COLOR);
+		src_image  = new Image(null, 0, 0, w, h, bgColor);
+		dest_image = new Image(null, 0, 0, w, h, bgColor);
 		
-		CellAutomatation.genRandomCells( src_image , 150, 100);
-		lastTime = Timer.stamp();
-		
-		switch (context) {
+		switch (window.renderer.context) {
 			
 			case CANVAS (context):
-				// TODO: how to AVOID smoothing ;) ?
-				context.fillStyle = "#" + StringTools.hex (config.background, 6);
+				context.fillStyle = "#" + StringTools.hex (config.windows[0].background, 6);
 				context.fillRect (0, 0, window.width, window.height);
 			
 			case DOM (element):				
-				// TODO: HOW TO SCALE HERE ?
-				element.style.backgroundColor = "#" + StringTools.hex (config.background, 6);
+				element.style.backgroundColor = "#" + StringTools.hex (config.windows[0].background, 6);
+				element.style.margin = "auto";
 				element.appendChild (src_image.src);
 				
 			case FLASH (sprite):
@@ -65,21 +69,26 @@ class Main extends Application {
 				#end
 				
 			case OPENGL (gl):
-				OpenglRender.init(gl, config.background, src_image, scale);
+				bgColor -= 255; // alpha reverse
+				fgColor -= 255; // alpha reverse
+				OpenglRender.init(gl, config.windows[0].background, src_image, scale);
 				
 			default:
 		}
 		
-	}
+		CellAutomatation.genRandomCells( src_image , 100, 80, bgColor, fgColor);
+		CellAutomatation.genRandomCells( src_image , 120, 85, bgColor, fgColor);
+		CellAutomatation.genRandomCells( src_image , 110, 90, bgColor, fgColor);
+		
+		lastTime = Timer.stamp();		
+	}	
 	
+	public override function onMouseDown (window:Window, x:Float, y:Float, button:Int):Void {	
+		CellAutomatation.genRandomCells(src_image , x/scale, y/scale, bgColor, fgColor);
+		CellAutomatation.genRandomCells(dest_image, x/scale, y/scale, bgColor, fgColor);
+	}	
 	
-	public override function onMouseDown (x:Float, y:Float, button:Int):Void {	
-		CellAutomatation.genRandomCells(src_image , x/scale, y/scale);
-		CellAutomatation.genRandomCells(dest_image, x/scale, y/scale);
-	}
-	
-	
-	public override function render (context:RenderContext):Void {
+	public override function render (renderer:Renderer):Void {
 		
 		// not at full fps:
 		if (Timer.stamp()-lastTime > time)
@@ -90,31 +99,33 @@ class Main extends Application {
 			if (Math.random() < 0.1) rule = CellAutomatation.getRandomRule();
 
 			// calculate next state depending on prev state
-			CellAutomatation.nextLifeGeneration ( src_image, dest_image, rule, swap );
+			CellAutomatation.nextLifeGeneration ( src_image, dest_image, rule, bgColor, fgColor, swap );
 			swap = ! swap;
 			
-			
-			switch (context) {
+			switch (renderer.context) {
 				case CANVAS (context):					
 					if (swap) {
-						ImageCanvasUtil.sync (src_image);
+						ImageCanvasUtil.sync (src_image, true);
 						context.drawImage (src_image.src , 0, 0, src_image.width  * scale, src_image.height  * scale);
 					}
 					else {
-						ImageCanvasUtil.sync (dest_image);
+						ImageCanvasUtil.sync (dest_image, true);
 						context.drawImage (dest_image.src, 0, 0, dest_image.width * scale, dest_image.height * scale);
 					}
 				
 				case DOM (element):
 					element.removeChild(element.firstChild);
+					var dom_image:Image = new Image(null, 0, 0, w, h, bgColor);
 					if (swap) {
-						ImageCanvasUtil.sync (src_image);
-						element.appendChild (src_image.src);
+						ImageCanvasUtil.sync (src_image, true);
+						ImageCanvasUtil.copyPixels(dom_image, src_image, new Rectangle(0, 0, w, h), new Vector2(0, 0) );
 					}
 					else {
-						ImageCanvasUtil.sync (dest_image);
-						element.appendChild (dest_image.src);
+						ImageCanvasUtil.sync (dest_image, true);
+						ImageCanvasUtil.copyPixels(dom_image, dest_image, new Rectangle(0, 0, w, h), new Vector2(0, 0) );
 					}
+					ImageCanvasUtil.resize(dom_image, Math.floor(w * scale), Math.floor(h * scale) );
+					element.appendChild (dom_image.src);
 					
 				case FLASH (sprite):
 					#if flash
@@ -133,15 +144,13 @@ class Main extends Application {
 		}
 		
 		// OpenGl Draw (every frame):
-		switch (context) {
+		switch (renderer.context) {
 			case OPENGL (gl):
 				OpenglRender.render(gl, window.width, window.height);				
 			default:
 		}
-
 		
 	}
-	
 	
 
 	

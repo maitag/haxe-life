@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project>
 	
-	<meta title="nextLifeGeneration" package="de.maitag.nextLifeGeneration" version="0.1.0" company="Sylvio Sell - maitag" />
+	<meta title="nextLifeGeneration" package="de.maitag.nextLifeGeneration" version="0.5.0" company="Sylvio Sell - maitag" />
 	<app main="Main" path="Export" file="nextLifeGeneration" />
+	
+	<!-- <android target-sdk-version="19" />	-->
 	
 	<window background="#000000" width="1200" height="800" />
 	
@@ -11,6 +13,8 @@
 	<haxelib name="lime" />
 	<!-- <haxedef name="canvas" /> -->
 	<!-- <haxedef name="dom" /> -->
+	
+	<haxeflag name="-dce" value="full" if="html5" />
 	
 	<assets path="Assets" rename="assets" exclude="*.svg" />
 	<icon path="Assets/lime.svg" />
